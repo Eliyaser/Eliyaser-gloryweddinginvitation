@@ -12,7 +12,9 @@ const busGrid = document.getElementById("busGrid");
 busRoutes.forEach(([number, route]) => {
   const card = document.createElement("div");
   card.className = "col-md-6 col-lg-4 col-xl-3";
-  card.innerHTML = `<div class="bus-card"><div class="route-no">${number}</div><p class="mt-2 mb-3">${route}</p><a class="route-link" target="_blank" rel="noopener" href="https://moovitapp.com/index/en/public_transit-line-${number.toLowerCase()}-Chennai-4612">Route details ↗</a></div>`;
+  const transitUrl =
+    "https://www.google.com/maps/dir/?api=1&destination=Jacob%20Gardens%2C%20Padappai%2C%20Tamil%20Nadu%20601301&travelmode=transit";
+  card.innerHTML = `<div class="bus-card"><div class="route-no">${number}</div><p class="mt-2 mb-3">${route}</p><a class="route-link" target="_blank" rel="noopener" href="${transitUrl}">Plan transit trip ↗</a></div>`;
   busGrid.appendChild(card);
 });
 
