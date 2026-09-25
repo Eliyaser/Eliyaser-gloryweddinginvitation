@@ -108,7 +108,7 @@ document.getElementById("rsvpForm").addEventListener("submit", (event) => {
   event.preventDefault();
   const name = document.getElementById("guestName").value.trim();
   const response = document.getElementById("guestResponse").value;
-  const message = `Hello Eliyaser & Glory!\n\nThis is ${name}. ${response} for your wedding on 28 November 2026 at Jacob Gardens, Padappai.\n\nWishing you both a beautiful and blessed wedding! ❤️`;
+  const message = `Hello Eliyaser & Glory!\n\nThis is ${name}. ${response} for your wedding on 28 November 2026 at Jacob Gardens, Padappai.\n\nWishing you both a beautiful and blessed wedding!`;
   window.open(
     `https://wa.me/?text=${encodeURIComponent(message)}`,
     "_blank",
