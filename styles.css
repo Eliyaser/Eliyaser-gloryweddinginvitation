@@ -792,7 +792,9 @@ footer .script {
   object-fit: contain;
   display: block;
   opacity: 0;
-  transform: scale(0.985);
+  transform: scale(1);
+  transform-origin: center center;
+  cursor: zoom-in;
   transition:
     opacity 0.25s ease,
     transform 0.25s ease;

@@ -140,6 +140,15 @@ const lightboxStage = document.getElementById("lightboxStage");
 const initialGalleryCount = 9;
 let showAllPhotos = false;
 let currentPhotoIndex = 0;
+let lightboxZoom = 1;
+
+function resetLightboxZoom() {
+  lightboxZoom = 1;
+  if (lightboxImage) {
+    lightboxImage.style.transform = "scale(1)";
+    lightboxImage.style.cursor = "zoom-in";
+  }
+}
 
 function getGalleryImageUrl(photo) {
   return photo.src;
@@ -182,6 +191,7 @@ function updateLightboxDisplay(index) {
   if (!photo) return;
 
   currentPhotoIndex = index;
+  resetLightboxZoom();
   lightboxCounter.textContent = `${index + 1} / ${engagementPhotos.length}`;
   lightboxImage.src = getGalleryImageUrl(photo);
   lightboxImage.alt = photo.alt;
@@ -208,6 +218,7 @@ function openLightbox(index) {
 function closeLightbox() {
   if (!lightbox) return;
 
+  resetLightboxZoom();
   lightbox.classList.remove("open");
   lightbox.setAttribute("aria-hidden", "true");
   document.body.classList.remove("lightbox-open");
@@ -246,6 +257,27 @@ if (lightboxPrev) {
 
 if (lightboxNext) {
   lightboxNext.addEventListener("click", goToNext);
+}
+
+if (lightboxStage) {
+  lightboxStage.addEventListener(
+    "wheel",
+    (event) => {
+      if (!lightbox || !lightbox.classList.contains("open")) return;
+      event.preventDefault();
+
+      const zoomStep = 0.12;
+      const nextZoom =
+        event.deltaY < 0
+          ? Math.min(lightboxZoom + zoomStep, 2.5)
+          : Math.max(lightboxZoom - zoomStep, 1);
+
+      lightboxZoom = nextZoom;
+      lightboxImage.style.transform = `scale(${lightboxZoom})`;
+      lightboxImage.style.cursor = lightboxZoom > 1 ? "zoom-out" : "zoom-in";
+    },
+    { passive: false },
+  );
 }
 
 if (lightbox) {
