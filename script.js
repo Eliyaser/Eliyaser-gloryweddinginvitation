@@ -117,3 +117,179 @@ document.getElementById("rsvpForm").addEventListener("submit", (event) => {
     "noopener",
   );
 });
+
+const engagementPhotos = Array.from({ length: 23 }, (_, index) => {
+  const number = String(index + 1).padStart(3, "0");
+  return {
+    src: `https://eliyaser-engagement-photos.s3.ap-south-1.amazonaws.com/image_${number}.jpg`,
+    alt: `Eliyaser and Glory engagement photo ${index + 1}`,
+    layout: ["featured", "tall", "medium", "wide", "square"][index % 5],
+  };
+});
+
+const galleryGrid = document.getElementById("engagementGallery");
+const galleryToggle = document.getElementById("toggleGallery");
+const lightbox = document.getElementById("engagementLightbox");
+const lightboxImage = document.getElementById("lightboxImage");
+const lightboxCounter = document.getElementById("lightboxCounter");
+const lightboxPrev = document.querySelector(".lightbox-prev");
+const lightboxNext = document.querySelector(".lightbox-next");
+const lightboxClose = document.querySelector(".lightbox-close");
+const lightboxStage = document.getElementById("lightboxStage");
+
+const initialGalleryCount = 9;
+let showAllPhotos = false;
+let currentPhotoIndex = 0;
+
+function getGalleryImageUrl(photo) {
+  return photo.src;
+}
+
+function renderGallery() {
+  if (!galleryGrid) return;
+
+  galleryGrid.innerHTML = "";
+
+  engagementPhotos.forEach((photo, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `gallery-item ${photo.layout}`;
+    if (!showAllPhotos && index >= initialGalleryCount) {
+      button.classList.add("hidden");
+    }
+    button.setAttribute("aria-label", `Open engagement photo ${index + 1}`);
+    button.dataset.index = String(index);
+
+    const img = document.createElement("img");
+    img.src = getGalleryImageUrl(photo);
+    img.alt = photo.alt;
+    img.loading = index < 5 ? "eager" : "lazy";
+    img.decoding = "async";
+    img.draggable = false;
+
+    button.appendChild(img);
+    button.addEventListener("click", () => openLightbox(index));
+    galleryGrid.appendChild(button);
+  });
+
+  galleryToggle.textContent = showAllPhotos
+    ? "Show Fewer Photos"
+    : "View All Photos";
+}
+
+function updateLightboxDisplay(index) {
+  const photo = engagementPhotos[index];
+  if (!photo) return;
+
+  currentPhotoIndex = index;
+  lightboxCounter.textContent = `${index + 1} / ${engagementPhotos.length}`;
+  lightboxImage.src = getGalleryImageUrl(photo);
+  lightboxImage.alt = photo.alt;
+  lightboxImage.classList.remove("is-visible");
+
+  const preloadIndex = (index + 1) % engagementPhotos.length;
+  const preloadImage = new Image();
+  preloadImage.src = getGalleryImageUrl(engagementPhotos[preloadIndex]);
+
+  requestAnimationFrame(() => {
+    lightboxImage.classList.add("is-visible");
+  });
+}
+
+function openLightbox(index) {
+  if (!lightbox) return;
+
+  updateLightboxDisplay(index);
+  lightbox.classList.add("open");
+  lightbox.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lightbox-open");
+}
+
+function closeLightbox() {
+  if (!lightbox) return;
+
+  lightbox.classList.remove("open");
+  lightbox.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lightbox-open");
+}
+
+function goToPrevious() {
+  const nextIndex =
+    currentPhotoIndex === 0
+      ? engagementPhotos.length - 1
+      : currentPhotoIndex - 1;
+  updateLightboxDisplay(nextIndex);
+}
+
+function goToNext() {
+  const nextIndex =
+    currentPhotoIndex === engagementPhotos.length - 1
+      ? 0
+      : currentPhotoIndex + 1;
+  updateLightboxDisplay(nextIndex);
+}
+
+if (galleryToggle) {
+  galleryToggle.addEventListener("click", () => {
+    showAllPhotos = !showAllPhotos;
+    renderGallery();
+  });
+}
+
+if (lightboxClose) {
+  lightboxClose.addEventListener("click", closeLightbox);
+}
+
+if (lightboxPrev) {
+  lightboxPrev.addEventListener("click", goToPrevious);
+}
+
+if (lightboxNext) {
+  lightboxNext.addEventListener("click", goToNext);
+}
+
+if (lightbox) {
+  lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox) {
+      closeLightbox();
+    }
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (!lightbox || !lightbox.classList.contains("open")) return;
+
+  if (event.key === "Escape") closeLightbox();
+  if (event.key === "ArrowRight") goToNext();
+  if (event.key === "ArrowLeft") goToPrevious();
+});
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+if (lightboxStage) {
+  lightboxStage.addEventListener(
+    "touchstart",
+    (event) => {
+      touchStartX = event.changedTouches[0].screenX;
+      touchEndX = touchStartX;
+    },
+    { passive: true },
+  );
+
+  lightboxStage.addEventListener(
+    "touchend",
+    (event) => {
+      touchEndX = event.changedTouches[0].screenX;
+      const delta = touchStartX - touchEndX;
+
+      if (Math.abs(delta) > 50) {
+        if (delta > 0) goToNext();
+        else goToPrevious();
+      }
+    },
+    { passive: true },
+  );
+}
+
+renderGallery();
