@@ -901,6 +901,45 @@ body.lightbox-open {
   }
 }
 @media (max-width: 575px) {
+  .lightbox {
+    padding: 0;
+  }
+  .lightbox-stage {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    background: rgba(3, 8, 6, 0.98);
+  }
+  .lightbox-stage img {
+    width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+  }
+  .lightbox-meta {
+    left: 14px;
+    bottom: 14px;
+    padding: 8px 12px;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+  }
+  .lightbox-close,
+  .lightbox-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+  .lightbox-close {
+    top: 18px;
+    right: 18px;
+  }
+  .lightbox-prev {
+    left: 14px;
+  }
+  .lightbox-next {
+    right: 14px;
+  }
   .top-nav {
     border-radius: 18px;
   }
